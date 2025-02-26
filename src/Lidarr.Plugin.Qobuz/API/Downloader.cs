@@ -131,6 +131,8 @@ public static class Downloader
         track.Tag.Year = (uint)releaseDate.Year;
         track.Tag.Track = (uint)page.TrackNumber;
         track.Tag.TrackCount = (uint)albumPage.TracksCount;
+        track.Tag.Disc = (uint)page.MediaNumber;
+        track.Tag.DiscCount = (uint)albumPage.MediaCount;
         if (albumPage.Genre != null && !string.IsNullOrEmpty(albumPage.Genre.Name))
             track.Tag.Genres = [ albumPage.Genre.Name ];
 

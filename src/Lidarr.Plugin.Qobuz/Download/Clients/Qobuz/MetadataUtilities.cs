@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using QobuzApiSharp.Models.Content;
+using static Npgsql.Replication.PgOutput.Messages.RelationMessage;
 
 namespace NzbDrone.Core.Download.Clients.Qobuz
 {
@@ -22,11 +23,13 @@ namespace NzbDrone.Core.Download.Clients.Qobuz
                 [qobuzPage.Performer.Name], // tracks don't seem to have a proper way to handle multiple artists
                 $"{qobuzPage.TrackNumber:00}",
                 qobuzAlbum.TracksCount.ToString(),
+                $"{qobuzPage.MediaNumber:00}",
+                qobuzAlbum.MediaCount.ToString(),
                 releaseDate.Year.ToString(CultureInfo.InvariantCulture),
                 ext);
         }
 
-        private static string GetFilledTemplate_Internal(string template, string title, string album, string albumArtist, string artist, string[] albumArtists, string[] artists, string track, string trackCount, string year, string ext)
+        private static string GetFilledTemplate_Internal(string template, string title, string album, string albumArtist, string artist, string[] albumArtists, string[] artists, string track, string trackCount, string volume, string volumeCount, string year, string ext)
         {
             StringBuilder t = new(template);
             ReplaceC("%title%", title);
@@ -37,6 +40,8 @@ namespace NzbDrone.Core.Download.Clients.Qobuz
             ReplaceC("%artists%", string.Join("; ", artists));
             ReplaceC("%track%", track);
             ReplaceC("%trackcount%", trackCount);
+            ReplaceC("%volume%", volume);
+            ReplaceC("%volumecount%", volumeCount);
             ReplaceC("%ext%", ext);
             ReplaceC("%year%", year);
 
