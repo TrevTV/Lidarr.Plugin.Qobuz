@@ -32,6 +32,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
+          fetch-depth: 0
+          tags: true
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
@@ -57,31 +59,22 @@ jobs:
         with:
           name: ${{ env.PLUGIN_NAME }}.${{ matrix.framework }}
           path: ./_plugins/net6.0/${{ env.PLUGIN_NAME }}/${{ env.PLUGIN_NAME }}.*
-  publish:
-    needs: build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          tags: true
       - name: Generate Changelog
-        id: generate_changelog
+        if: github.ref == 'refs/heads/main'
         run: |
           echo "Changelog:" > changelog.txt
           git log --oneline $(git describe --tags --abbrev=0)..HEAD | awk '{print "- " substr($0, index($0,$2))}' >> changelog.txt
       - name: Display Changelog
+        if: github.ref == 'refs/heads/main'
         run: cat changelog.txt
-      - name: Download Artifact
-        uses: dawidd6/action-download-artifact@v7
-        with:
-          name: ${{ env.PLUGIN_NAME }}.net6.0
-          skip_unpack: true
-          if_no_artifact_found: warn
+      - name: Zip Plugin
+        if: github.ref == 'refs/heads/main'
+        run: |
+          sudo apt update && sudo apt install -y p7zip-full
+          7z a -tzip ${{ env.PLUGIN_NAME }}.net6.0.zip ./_plugins/net6.0/${{ env.PLUGIN_NAME }}/${{ env.PLUGIN_NAME }}.*
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
         with:
           tag_name: ${{ env.PLUGIN_VERSION }}
           name: ${{ env.PLUGIN_VERSION }}
