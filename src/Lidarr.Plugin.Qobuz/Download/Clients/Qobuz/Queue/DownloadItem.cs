@@ -141,7 +141,7 @@ namespace NzbDrone.Core.Download.Clients.Qobuz.Queue
 
             await QobuzAPI.Instance.Client.ApplyMetadataToFile(track, outPath, plainLyrics, token: cancellation);
 
-            if (syncLyrics != null)
+            if (!string.IsNullOrWhiteSpace(syncLyrics))
                 await CreateLrcFile(Path.Combine(outDir, MetadataUtilities.GetFilledTemplate("%volume% - %track% - %title%.%ext%", "lrc", page, _qobuzAlbum)), syncLyrics);
 
             // TODO: this is currently a waste of resources, if this pr ever gets merged, it can be reenabled
